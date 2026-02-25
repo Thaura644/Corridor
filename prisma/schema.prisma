@@ -1,0 +1,62 @@
+// This is a production-grade schema for a corridor treasury wallet
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Organization {
+  id        String    @id @default(cuid())
+  name      String
+  wallets   Wallet[]
+  users     User[]
+  apiKeys   ApiKey[]
+  createdAt DateTime  @default(now())
+}
+
+model Wallet {
+  id             String        @id @default(cuid())
+  currency       String        // KES, UGX, USD
+  balance        Decimal       @default(0)
+  pendingBalance Decimal       @default(0)
+  orgId          String
+  organization   Organization  @relation(fields: [orgId], references: [id])
+  entries        LedgerEntry[]
+}
+
+model LedgerEntry {
+  id            String      @id @default(cuid())
+  walletId      String
+  wallet        Wallet      @relation(fields: [walletId], references: [id])
+  debit         Decimal     @default(0)
+  credit        Decimal     @default(0)
+  transactionId String
+  transaction   Transaction @relation(fields: [transactionId], references: [id])
+}
+
+model Transaction {
+  id          String        @id @default(cuid())
+  reference   String        @unique
+  description String
+  status      String        // PENDING, SETTLED, FAILED
+  entries     LedgerEntry[]
+  createdAt   DateTime      @default(now())
+}
+
+model User {
+  id    String @id @default(cuid())
+  email String @unique
+  orgId String
+  org   Organization @relation(fields: [orgId], references: [id])
+}
+
+model ApiKey {
+  id    String @id @default(cuid())
+  key   String @unique
+  orgId String
+  org   Organization @relation(fields: [orgId], references: [id])
+}
