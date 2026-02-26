@@ -7,7 +7,7 @@ import { LayoutDashboard, Send, History, Settings, ShieldCheck } from "lucide-re
 import { cn } from "@/lib/utils";
 
 const mobileItems = [
-  { icon: LayoutDashboard, label: "Home", href: "/" },
+  { icon: LayoutDashboard, label: "Home", href: "/dashboard" },
   { icon: Send, label: "Send", href: "/send-payment" },
   { icon: ShieldCheck, label: "Compliance", href: "/compliance" },
   { icon: History, label: "History", href: "/transactions" },

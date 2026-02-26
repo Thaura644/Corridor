@@ -12,7 +12,6 @@ import {
   BarChart3,
   History,
   Users,
-  CheckCircle2,
   ShieldCheck,
   Settings,
   Key,
@@ -25,7 +24,7 @@ import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 
 const sidebarItems = [
-  { icon: LayoutDashboard, label: "Dashboard", href: "/" },
+  { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
   { icon: Wallet, label: "Wallets", href: "/wallets" },
   { icon: Send, label: "Send Payment", href: "/send-payment" },
   { icon: RefreshCw, label: "FX Convert", href: "/fx-convert" },
