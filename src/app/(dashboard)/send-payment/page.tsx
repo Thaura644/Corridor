@@ -27,12 +27,38 @@ export default function SendPaymentPage() {
   const [amount, setAmount] = useState("");
   const [currency, setCurrency] = useState("KES");
   const [isSuccess, setIsSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [txnRef, setTxnRef] = useState("");
 
   const nextStep = () => setStep(step + 1);
   const prevStep = () => setStep(step - 1);
 
-  const handleSend = () => {
-    setIsSuccess(true);
+  const handleSend = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/payments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: parseFloat(amount),
+          currency,
+          recipient: details.name,
+          recipientType,
+          description: `Corridor payment to ${details.name}`
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setTxnRef(data.transaction.reference);
+        setIsSuccess(true);
+      } else {
+        alert(data.error || "Payment failed");
+      }
+    } catch (err) {
+      alert("Failed to connect to payment engine");
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (isSuccess) {
@@ -47,7 +73,7 @@ export default function SendPaymentPage() {
           <Check className="text-white w-10 h-10" />
         </motion.div>
         <h1 className="text-2xl font-bold text-slate-900 mb-2">Payment Sent Successfully</h1>
-        <p className="text-slate-500 mb-8">Transaction Ref: COR-7729-XPK</p>
+        <p className="text-slate-500 mb-8">Transaction Ref: {txnRef}</p>
         <div className="bg-white p-6 rounded-lg border border-border text-left space-y-3 mb-8">
           <div className="flex justify-between text-sm">
             <span className="text-slate-500 font-medium">Recipient</span>
@@ -287,13 +313,13 @@ export default function SendPaymentPage() {
           )}
           <button
             onClick={step === 4 ? handleSend : nextStep}
-            disabled={step === 1 && !recipientType}
+            disabled={(step === 1 && !recipientType) || loading}
             className={cn(
               "flex-[2] py-3 bg-primary text-white rounded-lg font-bold transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20",
-              (step === 1 && !recipientType) ? "opacity-50 cursor-not-allowed" : "hover:bg-primary/90"
+              ((step === 1 && !recipientType) || loading) ? "opacity-50 cursor-not-allowed" : "hover:bg-primary/90"
             )}
           >
-            {step === 4 ? "Confirm & Send" : "Continue"} <ChevronRight size={18} />
+            {loading ? "Processing..." : step === 4 ? "Confirm & Send" : "Continue"} <ChevronRight size={18} />
           </button>
         </div>
       </div>
