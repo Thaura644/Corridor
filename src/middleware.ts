@@ -22,9 +22,8 @@ export function middleware(request: NextRequest) {
   const session = request.cookies.get('session')?.value
 
   if (isProtectedRoute && !session) {
-    // In a real app, redirect to login
-    // For this prototype, we'll allow it but set a mock session if needed
-    // return NextResponse.redirect(new URL('/login', request.url))
+    // Redirect unauthorized users to login
+    return NextResponse.redirect(new URL('/login', request.url))
   }
 
   return NextResponse.next()

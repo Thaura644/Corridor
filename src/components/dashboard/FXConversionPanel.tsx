@@ -9,6 +9,7 @@ export default function FXConversionPanel() {
   const [isFlipped, setIsFlipped] = useState(false);
   const [rate, setRate] = useState(31.24);
   const [isPulse, setIsPulse] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -20,6 +21,34 @@ export default function FXConversionPanel() {
   }, []);
 
   const toAmount = (parseFloat(fromAmount || "0") * (isFlipped ? 1/rate : rate)).toFixed(2);
+
+  const handleConvert = async () => {
+    setLoading(true);
+    try {
+      const fromCurrency = isFlipped ? "UGX" : "KES";
+      const toCurrency = isFlipped ? "KES" : "UGX";
+      const res = await fetch("/api/fx/convert", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fromCurrency,
+          toCurrency,
+          amount: parseFloat(fromAmount),
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert(`Successfully converted ${fromAmount} ${fromCurrency} to ${data.convertedAmount} ${toCurrency}`);
+        window.location.reload(); // Quick way to refresh balances
+      } else {
+        alert(data.error || "Conversion failed");
+      }
+    } catch (err) {
+      alert("Failed to connect to FX engine");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-subtle border border-border h-full flex flex-col">
@@ -85,8 +114,12 @@ export default function FXConversionPanel() {
         </div>
       </div>
 
-      <button className="w-full mt-6 py-3 bg-primary text-white rounded-lg font-bold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">
-        Convert Now
+      <button
+        onClick={handleConvert}
+        disabled={loading || !fromAmount}
+        className="w-full mt-6 py-3 bg-primary text-white rounded-lg font-bold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 disabled:opacity-50"
+      >
+        {loading ? "Converting..." : "Convert Now"}
       </button>
     </div>
   );
