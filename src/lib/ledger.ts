@@ -1,75 +1,130 @@
-export type Currency = "KES" | "UGX" | "USD";
+import { prisma } from './db'
 
-export interface Account {
-  id: string;
-  name: string;
-  type: "asset" | "liability" | "equity" | "revenue" | "expense";
-  currency: Currency;
-  balance: number;
+export type Currency = 'KES' | 'UGX' | 'USD'
+export type TransactionType = 'PAYMENT' | 'CONVERSION' | 'DEPOSIT' | 'WITHDRAWAL'
+
+export interface LedgerTransaction {
+  id: string
+  amount: number
+  currency: Currency
+  type: TransactionType
+  status: string
+  reference: string
+  createdAt: Date
 }
 
-export interface Entry {
-  accountId: string;
-  debit: number;
-  credit: number;
-}
-
-export interface Transaction {
-  id: string;
-  timestamp: Date;
-  description: string;
-  entries: Entry[];
-  reference?: string;
-}
-
-export class Ledger {
-  private accounts: Map<string, Account> = new Map();
-  private transactions: Transaction[] = [];
-
-  constructor() {
-    this.createAccount({ id: "kes_vault", name: "Kenya Liquidity Pool", type: "asset", currency: "KES", balance: 142500000 });
-    this.createAccount({ id: "ugx_vault", name: "Uganda Liquidity Pool", type: "asset", currency: "UGX", balance: 3850200000 });
-    this.createAccount({ id: "kes_customer_1", name: "Alex Mwangi Wallet", type: "liability", currency: "KES", balance: 15000 });
-    this.createAccount({ id: "ugx_customer_2", name: "Kampala Agri-Hub", type: "liability", currency: "UGX", balance: 2400000 });
-    this.createAccount({ id: "fx_revenue", name: "FX Spread Revenue", type: "revenue", currency: "USD", balance: 0 });
+export class PersistentLedger {
+  /**
+   * Get balance for a specific wallet
+   */
+  static async getBalance(userId: string, currency: Currency): Promise<number> {
+    const wallet = await prisma.wallet.findUnique({
+      where: {
+        userId_currency: { userId, currency },
+      },
+    })
+    return wallet ? Number(wallet.balance) : 0
   }
 
-  createAccount(account: Account) {
-    this.accounts.set(account.id, account);
-  }
-
-  getAccount(id: string): Account | undefined {
-    return this.accounts.get(id);
-  }
-
-  recordTransaction(description: string, entries: Entry[], reference?: string): string {
-    const txId = `TX-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
-    const transaction: Transaction = {
-      id: txId,
-      timestamp: new Date(),
-      description,
-      entries,
-      reference
-    };
-
-    for (const entry of entries) {
-      const account = this.accounts.get(entry.accountId);
-      if (!account) throw new Error(`Account ${entry.accountId} not found`);
-
-      if (account.type === "asset" || account.type === "expense") {
-        account.balance += entry.debit - entry.credit;
-      } else {
-        account.balance += entry.credit - entry.debit;
-      }
+  /**
+   * Ensure wallets exist for a user
+   */
+  static async ensureWallets(userId: string) {
+    const currencies: Currency[] = ['KES', 'UGX', 'USD']
+    for (const currency of currencies) {
+      await prisma.wallet.upsert({
+        where: { userId_currency: { userId, currency } },
+        update: {},
+        create: { userId, currency, balance: 0 },
+      })
     }
-
-    this.transactions.push(transaction);
-    return txId;
   }
 
-  getTransactions() {
-    return this.transactions;
+  /**
+   * Record a double-entry transaction
+   */
+  static async recordTransaction(params: {
+    userId: string
+    amount: number
+    currency: Currency
+    type: TransactionType
+    reference: string
+    description: string
+    metadata?: Record<string, unknown>
+  }) {
+    const { userId, amount, currency, type, reference, description, metadata } = params
+
+    return await prisma.$transaction(async (tx) => {
+      // 1. Get or create the wallet
+      const wallet = await tx.wallet.upsert({
+        where: { userId_currency: { userId, currency } },
+        update: {
+          balance: { increment: amount }
+        },
+        create: {
+          userId,
+          currency,
+          balance: amount,
+        },
+      })
+
+      // 2. Create the transaction record
+      const transaction = await tx.transaction.create({
+        data: {
+          amount,
+          currency,
+          type,
+          reference,
+          status: 'SETTLED',
+          metadata: metadata ? JSON.stringify(metadata) : null,
+        },
+      })
+
+      // 3. Create the ledger entry
+      await tx.ledgerEntry.create({
+        data: {
+          walletId: wallet.id,
+          transactionId: transaction.id,
+          amount,
+          description,
+        },
+      })
+
+      return transaction
+    })
+  }
+
+  /**
+   * Get transaction history for a user
+   */
+  static async getHistory(userId: string): Promise<LedgerTransaction[]> {
+    const wallets = await prisma.wallet.findMany({
+      where: { userId },
+      select: { id: true }
+    })
+
+    const walletIds = wallets.map(w => w.id)
+
+    const entries = await prisma.ledgerEntry.findMany({
+      where: {
+        walletId: { in: walletIds }
+      },
+      include: {
+        transaction: true
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    })
+
+    return entries.map(e => ({
+      id: e.transaction.id,
+      amount: Number(e.amount),
+      currency: e.transaction.currency as Currency,
+      type: e.transaction.type as TransactionType,
+      status: e.transaction.status,
+      reference: e.transaction.reference,
+      createdAt: e.transaction.createdAt,
+    }))
   }
 }
-
-export const corridorLedger = new Ledger();
