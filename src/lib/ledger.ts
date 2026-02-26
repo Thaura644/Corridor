@@ -1,6 +1,7 @@
 import { prisma } from './db'
+import { AfricanCurrencyCode } from './constants'
 
-export type Currency = 'KES' | 'UGX' | 'USD'
+export type Currency = AfricanCurrencyCode
 export type TransactionType = 'PAYMENT' | 'CONVERSION' | 'DEPOSIT' | 'WITHDRAWAL'
 
 export interface LedgerTransaction {
@@ -30,8 +31,8 @@ export class PersistentLedger {
    * Ensure wallets exist for a user
    */
   static async ensureWallets(userId: string) {
-    const currencies: Currency[] = ['KES', 'UGX', 'USD']
-    for (const currency of currencies) {
+    const defaultCurrencies: Currency[] = ['KES', 'UGX', 'NGN', 'ZAR', 'USD']
+    for (const currency of defaultCurrencies) {
       await prisma.wallet.upsert({
         where: { userId_currency: { userId, currency } },
         update: {},

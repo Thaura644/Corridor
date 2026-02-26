@@ -10,7 +10,7 @@ export default function FXConvertPage() {
       <div className="flex justify-between items-end">
         <div>
           <h1 className="text-3xl font-bold text-slate-900 tracking-tight">FX Conversion Desk</h1>
-          <p className="text-slate-500 mt-1">Instant internal settlement between KES and UGX liquidity pools</p>
+          <p className="text-slate-500 mt-1">Instant internal settlement between Pan-African liquidity pools</p>
         </div>
       </div>
 
@@ -23,7 +23,7 @@ export default function FXConvertPage() {
           <div className="bg-white p-8 rounded-lg border border-border shadow-subtle">
              <div className="flex items-center gap-2 mb-6">
                 <TrendingUp size={20} className="text-primary" />
-                <h3 className="font-bold text-slate-900">Live Corridor Spread</h3>
+                <h3 className="font-bold text-slate-900">Live Regional Spread</h3>
              </div>
              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-4">
@@ -62,9 +62,9 @@ export default function FXConvertPage() {
       <div className="p-6 bg-secondary text-white rounded-lg flex items-start gap-4">
          <Info size={24} className="text-accent mt-1" />
          <div>
-            <h4 className="font-bold text-lg">Corridor Liquidity Notice</h4>
+            <h4 className="font-bold text-lg">Pan-African Liquidity Notice</h4>
             <p className="text-white/60 text-sm leading-relaxed mt-1">
-               Conversions are settled instantly against our pre-funded pools. Large volume conversions (&gt; 50M KES) may require manual compliance override from our treasury desk.
+               Conversions are settled instantly against our regional pre-funded pools. Large volume conversions may require manual compliance override from our central treasury desk.
             </p>
          </div>
       </div>

@@ -3,43 +3,60 @@
 import React, { useState, useEffect } from "react";
 import { ArrowRightLeft, Info } from "lucide-react";
 import { motion } from "framer-motion";
+import { AFRICAN_CURRENCIES } from "@/lib/constants";
 
 export default function FXConversionPanel() {
   const [fromAmount, setFromAmount] = useState("1000");
-  const [isFlipped, setIsFlipped] = useState(false);
+  const [fromCurrency, setFromCurrency] = useState("KES");
+  const [toCurrency, setToCurrency] = useState("UGX");
   const [rate, setRate] = useState(31.24);
   const [isPulse, setIsPulse] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    // Mock rate fetching based on pair
+    const mockRates: Record<string, number> = {
+      "KES-UGX": 31.24,
+      "UGX-KES": 0.032,
+      "USD-KES": 129.50,
+      "KES-USD": 0.0077,
+      "USD-NGN": 1650.00,
+      "NGN-USD": 0.0006,
+      "ZAR-KES": 7.02,
+      "KES-ZAR": 0.14,
+    };
+    const key = `${fromCurrency}-${toCurrency}`;
+    setRate(mockRates[key] || 1.0);
+  }, [fromCurrency, toCurrency]);
+
+  useEffect(() => {
     const interval = setInterval(() => {
       setIsPulse(true);
       setTimeout(() => setIsPulse(false), 500);
-      setRate(prev => prev + (Math.random() - 0.5) * 0.01);
+      setRate(prev => prev + (Math.random() - 0.5) * 0.0001 * prev);
     }, 5000);
     return () => clearInterval(interval);
   }, []);
 
-  const toAmount = (parseFloat(fromAmount || "0") * (isFlipped ? 1/rate : rate)).toFixed(2);
+  const toAmount = (parseFloat(fromAmount || "0") * rate).toFixed(2);
 
   const handleConvert = async () => {
     setLoading(true);
     try {
-      const fromCurrency = isFlipped ? "UGX" : "KES";
-      const toCurrency = isFlipped ? "KES" : "UGX";
       const res = await fetch("/api/fx/convert", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          fromCurrency,
-          toCurrency,
+          from: fromCurrency,
+          to: toCurrency,
           amount: parseFloat(fromAmount),
+          rate: rate,
         })
       });
       const data = await res.json();
       if (data.success) {
-        alert(`Successfully converted ${fromAmount} ${fromCurrency} to ${data.convertedAmount} ${toCurrency}`);
-        window.location.reload(); // Quick way to refresh balances
+        alert(`Successfully converted ${fromAmount} ${fromCurrency} to ${data.toAmount} ${toCurrency}`);
+        window.location.reload();
       } else {
         alert(data.error || "Conversion failed");
       }
@@ -48,6 +65,12 @@ export default function FXConversionPanel() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSwap = () => {
+    const temp = fromCurrency;
+    setFromCurrency(toCurrency);
+    setToCurrency(temp);
   };
 
   return (
@@ -67,7 +90,13 @@ export default function FXConversionPanel() {
         <div className="relative">
           <label className="text-[10px] font-bold text-slate-400 uppercase mb-1 block">From</label>
           <div className="flex items-center gap-3 p-3 bg-background-soft rounded-lg border border-border focus-within:ring-2 focus-within:ring-primary/20 transition-all">
-            <span className="font-bold text-slate-700">{isFlipped ? "UGX" : "KES"}</span>
+            <select
+              value={fromCurrency}
+              onChange={(e) => setFromCurrency(e.target.value)}
+              className="bg-transparent border-none focus:ring-0 font-bold text-slate-700 p-0 pr-6"
+            >
+              {AFRICAN_CURRENCIES.map(c => <option key={c.code} value={c.code}>{c.code}</option>)}
+            </select>
             <input
               type="number"
               value={fromAmount}
@@ -79,7 +108,7 @@ export default function FXConversionPanel() {
 
         <div className="flex justify-center -my-2 relative z-10">
           <button
-            onClick={() => setIsFlipped(!isFlipped)}
+            onClick={handleSwap}
             className="w-8 h-8 bg-white rounded-full border border-border flex items-center justify-center text-primary shadow-sm hover:rotate-180 transition-transform duration-500"
           >
             <ArrowRightLeft size={14} />
@@ -88,8 +117,14 @@ export default function FXConversionPanel() {
 
         <div>
           <label className="text-[10px] font-bold text-slate-400 uppercase mb-1 block">To (Estimated)</label>
-          <div className="flex items-center gap-3 p-3 bg-background-soft rounded-lg border border-border">
-            <span className="font-bold text-slate-700">{isFlipped ? "KES" : "UGX"}</span>
+          <div className="flex items-center gap-3 p-3 bg-background-soft rounded-lg border border-border focus-within:ring-2 focus-within:ring-primary/20 transition-all">
+             <select
+              value={toCurrency}
+              onChange={(e) => setToCurrency(e.target.value)}
+              className="bg-transparent border-none focus:ring-0 font-bold text-slate-700 p-0 pr-6"
+            >
+              {AFRICAN_CURRENCIES.map(c => <option key={c.code} value={c.code}>{c.code}</option>)}
+            </select>
             <div className="text-xl font-mono font-bold w-full text-right text-slate-900">
               {toAmount}
             </div>
@@ -99,7 +134,7 @@ export default function FXConversionPanel() {
         <div className="p-4 bg-primary/5 rounded-lg space-y-2">
           <div className="flex justify-between text-xs">
             <span className="text-slate-500 font-medium">Exchange Rate</span>
-            <span className="text-slate-900 font-bold font-mono">1 {isFlipped ? "UGX" : "KES"} = {isFlipped ? (1/rate).toFixed(5) : rate.toFixed(2)} {isFlipped ? "KES" : "UGX"}</span>
+            <span className="text-slate-900 font-bold font-mono">1 {fromCurrency} = {rate.toFixed(4)} {toCurrency}</span>
           </div>
           <div className="flex justify-between text-xs">
             <span className="flex items-center gap-1 text-slate-500 font-medium">
