@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { PersistentLedger } from '@/lib/ledger'
 import { getCurrentUserId } from '@/lib/auth'
+import { prisma } from '@/lib/db'
 
 export async function GET() {
   const userId = await getCurrentUserId()
@@ -10,16 +11,17 @@ export async function GET() {
     // Ensure wallets exist
     await PersistentLedger.ensureWallets(userId)
 
-    const kes = await PersistentLedger.getBalance(userId, 'KES')
-    const ugx = await PersistentLedger.getBalance(userId, 'UGX')
-    const usd = await PersistentLedger.getBalance(userId, 'USD')
+    const wallets = await prisma.wallet.findMany({
+      where: { userId }
+    })
 
     return NextResponse.json({
-      wallets: [
-        { currency: 'KES', balance: kes, available: kes, pending: 0 },
-        { currency: 'UGX', balance: ugx, available: ugx, pending: 0 },
-        { currency: 'USD', balance: usd, available: usd, pending: 0 },
-      ]
+      wallets: wallets.map(w => ({
+        currency: w.currency,
+        balance: Number(w.balance),
+        available: Number(w.balance),
+        pending: 0
+      }))
     })
   } catch (error) {
     console.error('Wallet fetch error:', error)

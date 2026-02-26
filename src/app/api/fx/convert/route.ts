@@ -2,10 +2,14 @@ import { NextResponse } from 'next/server'
 import { PersistentLedger } from '@/lib/ledger'
 import { getCurrentUserId } from '@/lib/auth'
 import { z } from 'zod'
+import { AFRICAN_CURRENCIES, AfricanCurrencyCode } from '@/lib/constants'
+
+const currencyCodes: [AfricanCurrencyCode, ...AfricanCurrencyCode[]] =
+  AFRICAN_CURRENCIES.map(c => c.code) as [AfricanCurrencyCode, ...AfricanCurrencyCode[]]
 
 const convertSchema = z.object({
-  from: z.enum(['KES', 'UGX']),
-  to: z.enum(['KES', 'UGX']),
+  from: z.enum(currencyCodes),
+  to: z.enum(currencyCodes),
   amount: z.number().positive(),
   rate: z.number(),
 })

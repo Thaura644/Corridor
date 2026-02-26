@@ -79,8 +79,8 @@ export default function DashboardPage() {
       {/* Welcome Header */}
       <div className="flex justify-between items-end">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Nairobi - Kampala Corridor</h1>
-          <p className="text-slate-500 mt-1">Institutional Treasury Overview</p>
+          <h1 className="text-3xl font-bold text-slate-900">Pan-African Treasury Dashboard</h1>
+          <p className="text-slate-500 mt-1">Regional Liquidity & Infrastructure Control</p>
         </div>
         <div className="flex gap-3">
           <Button variant="outline" size="sm" className="gap-2">
@@ -120,7 +120,7 @@ export default function DashboardPage() {
               </motion.div>
             ))}
             <Card className="p-6 bg-[#0B1F33] text-white border-none shadow-lg">
-              <p className="text-sm font-medium text-slate-400">Total Corridor Exposure</p>
+              <p className="text-sm font-medium text-slate-400">Total Regional Exposure</p>
               <h3 className="text-2xl font-bold mt-2 font-mono">$1,240,050.12</h3>
               <div className="mt-4 flex items-center gap-2">
                 <TrendingUp className="h-4 w-4 text-[#12B76A]" />
@@ -135,7 +135,7 @@ export default function DashboardPage() {
         {/* Cashflow Graph */}
         <Card className="p-6 border-slate-100 shadow-sm">
           <div className="flex justify-between items-center mb-8">
-            <h3 className="font-bold text-lg text-slate-900">Corridor Cashflow</h3>
+            <h3 className="font-bold text-lg text-slate-900">Regional Cashflow</h3>
             <div className="flex bg-slate-50 p-1 rounded-lg">
               {['7D', '30D', '90D'].map(t => (
                 <button key={t} className={`px-3 py-1 text-xs font-bold rounded-md ${t === '7D' ? 'bg-white shadow-sm text-[#0E4D3A]' : 'text-slate-500'}`}>{t}</button>
@@ -165,7 +165,7 @@ export default function DashboardPage() {
         {/* Recent Transactions */}
         <Card className="p-6 border-slate-100 shadow-sm">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="font-bold text-lg text-slate-900">Recent Activity</h3>
+            <h3 className="font-bold text-lg text-slate-900">Regional Activity</h3>
             <Button variant="ghost" size="sm" className="text-[#0E4D3A] font-bold gap-1">
               View All <ChevronRight className="h-4 w-4" />
             </Button>

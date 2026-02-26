@@ -9,21 +9,24 @@ import {
   ArrowLeft,
   Info,
   ShieldCheck,
-  SmartphoneNfc
+  SmartphoneNfc,
+  Globe
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { AFRICAN_CURRENCIES } from "@/lib/constants";
 
 const recipientTypes = [
-  { id: "bank", label: "Bank Transfer", icon: Building2, desc: "Direct to any Kenyan or Ugandan bank account" },
+  { id: "bank", label: "Bank Transfer", icon: Building2, desc: "Direct to any African bank account" },
   { id: "mpesa", label: "Safaricom M-Pesa", icon: Smartphone, desc: "Instant mobile money to Kenyan numbers" },
-  { id: "mtn", label: "MTN MoMo", icon: SmartphoneNfc, desc: "Instant mobile money to Ugandan numbers" },
+  { id: "mtn", label: "MTN MoMo", icon: SmartphoneNfc, desc: "Instant mobile money to Ugandan/Ghanaian numbers" },
+  { id: "wallet", label: "External Wallet", icon: Globe, desc: "Transfer to other corridor-partner wallets" },
 ];
 
 export default function SendPaymentPage() {
   const [step, setStep] = useState(1);
   const [recipientType, setRecipientType] = useState("");
-  const [details, setDetails] = useState({ account: "", name: "", bank: "" });
+  const [details, setDetails] = useState({ account: "", name: "", bank: "", country: "Kenya" });
   const [amount, setAmount] = useState("");
   const [currency, setCurrency] = useState("KES");
   const [isSuccess, setIsSuccess] = useState(false);
@@ -44,7 +47,7 @@ export default function SendPaymentPage() {
           currency,
           recipient: details.name,
           recipientType,
-          description: `Corridor payment to ${details.name}`
+          description: `Pan-African payment to ${details.name}`
         })
       });
       const data = await res.json();
@@ -89,7 +92,7 @@ export default function SendPaymentPage() {
           </div>
         </div>
         <button
-          onClick={() => { setStep(1); setIsSuccess(false); setRecipientType(""); setDetails({ account: "", name: "", bank: "" }); setAmount(""); }}
+          onClick={() => { setStep(1); setIsSuccess(false); setRecipientType(""); setDetails({ account: "", name: "", bank: "", country: "Kenya" }); setAmount(""); }}
           className="w-full py-3 bg-primary text-white rounded-lg font-bold hover:bg-primary/90 transition-all"
         >
           Make Another Payment
@@ -101,8 +104,8 @@ export default function SendPaymentPage() {
   return (
     <div className="max-w-2xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Send Cross-Border Payment</h1>
-        <p className="text-slate-500 mt-1">Instant corridor settlement between Kenya and Uganda</p>
+        <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Send Pan-African Payment</h1>
+        <p className="text-slate-500 mt-1">Instant regional settlement across our Pan-African network</p>
       </div>
 
       {/* Stepper */}
@@ -167,6 +170,20 @@ export default function SendPaymentPage() {
               <h2 className="text-xl font-bold text-slate-900 mb-6">Recipient Details</h2>
               <div className="space-y-4">
                 <div>
+                  <label className="text-[10px] font-bold text-slate-400 uppercase mb-1 block">Recipient Country</label>
+                  <select
+                    className="w-full p-3 bg-background-soft rounded-lg border border-border focus:ring-2 focus:ring-primary/20"
+                    value={details.country}
+                    onChange={(e) => setDetails({ ...details, country: e.target.value })}
+                  >
+                    <option>Kenya</option>
+                    <option>Uganda</option>
+                    <option>Nigeria</option>
+                    <option>Ghana</option>
+                    <option>South Africa</option>
+                  </select>
+                </div>
+                <div>
                   <label className="text-[10px] font-bold text-slate-400 uppercase mb-1 block">Full Name</label>
                   <input
                     type="text"
@@ -178,11 +195,11 @@ export default function SendPaymentPage() {
                 </div>
                 <div>
                   <label className="text-[10px] font-bold text-slate-400 uppercase mb-1 block">
-                    {recipientType === "bank" ? "Account Number" : "Phone Number"}
+                    {recipientType === "bank" ? "Account Number / IBAN" : "Phone Number"}
                   </label>
                   <input
                     type="text"
-                    placeholder={recipientType === "bank" ? "0110...." : "254...."}
+                    placeholder={recipientType === "bank" ? "Account Number" : "International Format (+...)"}
                     className="w-full p-3 bg-background-soft rounded-lg border border-border focus:ring-2 focus:ring-primary/20"
                     value={details.account}
                     onChange={(e) => setDetails({ ...details, account: e.target.value })}
@@ -190,13 +207,14 @@ export default function SendPaymentPage() {
                 </div>
                 {recipientType === "bank" && (
                   <div>
-                    <label className="text-[10px] font-bold text-slate-400 uppercase mb-1 block">Bank Name</label>
-                    <select className="w-full p-3 bg-background-soft rounded-lg border border-border focus:ring-2 focus:ring-primary/20">
-                      <option>Select Bank</option>
-                      <option>KCB Bank</option>
-                      <option>Equity Bank</option>
-                      <option>Stanbic Bank</option>
-                    </select>
+                    <label className="text-[10px] font-bold text-slate-400 uppercase mb-1 block">Bank Name / BIC</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. GTBank, KCB, Standard Bank"
+                      className="w-full p-3 bg-background-soft rounded-lg border border-border focus:ring-2 focus:ring-primary/20"
+                      value={details.bank}
+                      onChange={(e) => setDetails({ ...details, bank: e.target.value })}
+                    />
                   </div>
                 )}
                 <div className="flex items-center gap-2">
@@ -235,16 +253,15 @@ export default function SendPaymentPage() {
                       value={currency}
                       onChange={(e) => setCurrency(e.target.value)}
                     >
-                      <option value="KES">KES</option>
-                      <option value="UGX">UGX</option>
+                      {AFRICAN_CURRENCIES.map(c => <option key={c.code} value={c.code}>{c.code}</option>)}
                     </select>
                   </div>
                 </div>
 
                 <div className="p-4 bg-background-soft rounded-lg space-y-3 border border-border">
                   <div className="flex justify-between text-xs">
-                    <span className="text-slate-500 font-medium">Transaction Fee</span>
-                    <span className="text-slate-900 font-bold">150.00 {currency}</span>
+                    <span className="text-slate-500 font-medium">Regional Network Fee</span>
+                    <span className="text-slate-900 font-bold">150.00 {currency} equivalent</span>
                   </div>
                   <div className="flex justify-between text-xs">
                     <span className="text-slate-500 font-medium">FX Margin (0.5%)</span>
@@ -258,7 +275,7 @@ export default function SendPaymentPage() {
                 <div className="flex items-start gap-2 p-3 bg-primary/5 rounded-lg border border-primary/10">
                   <Info size={16} className="text-primary mt-0.5" />
                   <p className="text-[10px] text-primary/80 leading-relaxed font-medium">
-                    This payment will be settled via the local liquidity pool. Recipient will receive funds instantly.
+                    This payment will be settled via the regional liquidity pool. Recipient will receive funds according to local rail settlement times (mostly instant).
                   </p>
                 </div>
               </div>
@@ -279,7 +296,7 @@ export default function SendPaymentPage() {
                   <div>
                     <p className="text-[10px] font-bold text-slate-400 uppercase">Recipient</p>
                     <p className="font-bold text-slate-900">{details.name}</p>
-                    <p className="text-xs text-slate-500">{recipientType.toUpperCase()} - {details.account}</p>
+                    <p className="text-xs text-slate-500">{recipientType.toUpperCase()} - {details.account} ({details.country})</p>
                   </div>
                   <Building2 className="text-slate-300" />
                 </div>
@@ -290,13 +307,13 @@ export default function SendPaymentPage() {
                   </div>
                   <div className="text-right">
                     <p className="text-[10px] font-bold text-slate-400 uppercase">Settlement</p>
-                    <p className="text-sm font-bold text-success">Instant</p>
+                    <p className="text-sm font-bold text-success">Near-Instant</p>
                   </div>
                 </div>
               </div>
               <div className="flex items-center gap-2 justify-center py-4">
                 <ShieldCheck size={18} className="text-success" />
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Encrypted Payment Channel</span>
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Encrypted Regional Payment Channel</span>
               </div>
             </motion.div>
           )}

@@ -16,16 +16,19 @@ export default function TopNav() {
           />
         </div>
 
-        <div className="hidden lg:flex items-center overflow-hidden w-64 border-l border-border pl-6">
+        <div className="hidden lg:flex items-center overflow-hidden w-96 border-l border-border pl-6">
           <div className="flex gap-4 animate-marquee whitespace-nowrap">
             <span className="text-xs font-mono font-bold text-slate-500">
               KES/UGX <span className="text-success">31.24 ↑</span>
             </span>
             <span className="text-xs font-mono font-bold text-slate-500">
-              USD/KES <span className="text-danger">129.50 ↓</span>
+              USD/NGN <span className="text-success">1650.00 ↑</span>
             </span>
             <span className="text-xs font-mono font-bold text-slate-500">
-              USD/UGX <span className="text-success">3850.00 ↑</span>
+              USD/ZAR <span className="text-danger">18.45 ↓</span>
+            </span>
+            <span className="text-xs font-mono font-bold text-slate-500">
+              GHS/KES <span className="text-success">8.15 ↑</span>
             </span>
           </div>
         </div>
@@ -33,10 +36,8 @@ export default function TopNav() {
 
       <div className="flex items-center gap-6">
         <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-background-soft rounded-full border border-border">
-          <span className="text-lg">🇰🇪</span>
-          <span className="text-[10px] font-bold text-slate-400">⇄</span>
-          <span className="text-lg">🇺🇬</span>
-          <span className="text-xs font-bold text-slate-700 ml-1">Corridor Active</span>
+          <span className="text-lg">🌍</span>
+          <span className="text-xs font-bold text-slate-700 ml-1">Pan-African Network Active</span>
         </div>
 
         <button className="relative p-2 text-slate-600 hover:bg-background-soft rounded-lg transition-colors">

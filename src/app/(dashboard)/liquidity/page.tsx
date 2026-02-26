@@ -13,9 +13,9 @@ import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 
 const poolAdjustments = [
-  { time: "2023-11-24 10:24:02", pool: "KES-P1", action: "Inbound Settlement", amount: "+2,400,000.00", operator: "System (Auto)", status: "Confirmed" },
-  { time: "2023-11-24 10:21:45", pool: "UGX-P1", action: "Cross-Pool Drain", amount: "-18,500,000.00", operator: "J. Doe (Admin)", status: "Confirmed" },
-  { time: "2023-11-24 10:18:30", pool: "KES-P2", action: "Internal Rebalance", amount: "1,000,000.00", operator: "System (Auto)", status: "Processing" },
+  { time: "2023-11-24 10:24:02", pool: "EAST-P1", action: "Inbound Settlement", amount: "+2,400,000.00", operator: "System (Auto)", status: "Confirmed" },
+  { time: "2023-11-24 10:21:45", pool: "WEST-P1", action: "Cross-Pool Drain", amount: "-18,500,000.00", operator: "J. Doe (Admin)", status: "Confirmed" },
+  { time: "2023-11-24 10:18:30", pool: "SOUTH-P1", action: "Internal Rebalance", amount: "1,000,000.00", operator: "System (Auto)", status: "Processing" },
 ];
 
 export default function LiquidityPage() {
@@ -42,8 +42,8 @@ export default function LiquidityPage() {
       {/* Top Controls Row */}
       <div className="flex flex-col md:flex-row items-center justify-between bg-white p-6 rounded-lg border border-border shadow-subtle gap-4">
         <div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Regional Pools Overview</h1>
-          <p className="text-slate-500 text-sm mt-1">Monitoring real-time liquidity across East African corridors.</p>
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Pan-African Regional Pools</h1>
+          <p className="text-slate-500 text-sm mt-1">Monitoring real-time liquidity across all African regional hubs.</p>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-3 px-4 py-2 bg-primary/5 rounded-lg border border-primary/10">
@@ -60,11 +60,11 @@ export default function LiquidityPage() {
 
       {/* Balances and Countdown Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* Pool KES */}
+        {/* Pool East Africa */}
         <div className="bg-white p-6 rounded-lg border border-border shadow-subtle group">
           <div className="flex justify-between items-start">
             <div>
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">KES Pool Balance</p>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">East Africa Hub (KES/UGX/TZS)</p>
               <p className="font-mono text-3xl font-bold text-slate-900 mt-2">142,500,000.00</p>
             </div>
             <span className="px-2 py-1 bg-success/10 text-success text-[10px] font-bold rounded">+2.4%</span>
@@ -75,12 +75,12 @@ export default function LiquidityPage() {
           </div>
         </div>
 
-        {/* Pool UGX */}
+        {/* Pool West Africa */}
         <div className="bg-white p-6 rounded-lg border border-border shadow-subtle group">
           <div className="flex justify-between items-start">
             <div>
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">UGX Pool Balance</p>
-              <p className="font-mono text-3xl font-bold text-slate-900 mt-2">3,850,200,000.00</p>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">West Africa Hub (NGN/GHS)</p>
+              <p className="font-mono text-3xl font-bold text-slate-900 mt-2">5,200,800,000.00</p>
             </div>
             <span className="px-2 py-1 bg-danger/10 text-danger text-[10px] font-bold rounded">-1.1%</span>
           </div>
@@ -113,7 +113,7 @@ export default function LiquidityPage() {
             </div>
           </div>
           <div className="bg-white/10 rounded-lg py-2 px-3 text-center">
-             <p className="text-white text-[10px] font-bold uppercase">Est. Net Value: <span className="font-mono">$241,050.12</span></p>
+             <p className="text-white text-[10px] font-bold uppercase">Est. Global Net Value: <span className="font-mono">$2,241,050.12</span></p>
           </div>
         </div>
       </div>
@@ -125,14 +125,14 @@ export default function LiquidityPage() {
           <div className="flex items-center justify-between mb-10">
             <div className="flex items-center gap-2">
               <Activity className="text-primary w-5 h-5" />
-              <h3 className="text-slate-900 font-bold">Cross-Pool Imbalance Indicator</h3>
+              <h3 className="text-slate-900 font-bold">Pan-African Imbalance Indicator</h3>
             </div>
             <div className="flex gap-4">
               <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase">
-                <div className="w-2 h-2 rounded-full bg-primary" /> UGX Dominant
+                <div className="w-2 h-2 rounded-full bg-primary" /> Net Inflow
               </div>
               <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase">
-                <div className="w-2 h-2 rounded-full bg-slate-200" /> KES Dominant
+                <div className="w-2 h-2 rounded-full bg-slate-200" /> Net Outflow
               </div>
             </div>
           </div>
@@ -149,14 +149,14 @@ export default function LiquidityPage() {
           </div>
           <div className="flex justify-between mt-6">
             <div className="text-center">
-              <p className="text-[10px] font-bold text-slate-400 uppercase">KES Pool</p>
+              <p className="text-[10px] font-bold text-slate-400 uppercase">East Hub</p>
               <p className="text-sm font-bold text-slate-700 mt-1 font-mono">-12.5%</p>
             </div>
             <div className="text-center">
-              <p className="text-[10px] font-bold text-slate-400 uppercase">Equilibrium</p>
+              <p className="text-[10px] font-bold text-slate-400 uppercase">Global Equilibrium</p>
             </div>
             <div className="text-center">
-              <p className="text-[10px] font-bold text-slate-400 uppercase">UGX Pool</p>
+              <p className="text-[10px] font-bold text-slate-400 uppercase">West Hub</p>
               <p className="text-sm font-bold text-primary mt-1 font-mono">+18.2%</p>
             </div>
           </div>
@@ -165,9 +165,9 @@ export default function LiquidityPage() {
         {/* Secondary Stats */}
         <div className="space-y-4">
           {[
-            { label: "Avg. Settlement Time", value: "1.2s", icon: TrendingUp, color: "bg-primary/10 text-primary" },
-            { label: "Pending Reconciliations", value: "14", icon: AlertCircle, color: "bg-warning/10 text-warning" },
-            { label: "Risk Score", value: "Low (0.02)", icon: ShieldCheck, color: "bg-success/10 text-success" },
+            { label: "Avg. Cross-Region Time", value: "1.2s", icon: TrendingUp, color: "bg-primary/10 text-primary" },
+            { label: "Pending Reconciliations", value: "42", icon: AlertCircle, color: "bg-warning/10 text-warning" },
+            { label: "Network Risk Score", value: "Low (0.05)", icon: ShieldCheck, color: "bg-success/10 text-success" },
           ].map((stat, i) => (
             <div key={i} className="bg-white p-4 rounded-lg border border-border shadow-subtle flex items-center gap-4">
               <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center", stat.color)}>
@@ -185,7 +185,7 @@ export default function LiquidityPage() {
       {/* Adjustments Table */}
       <div className="bg-white rounded-lg border border-border shadow-subtle overflow-hidden">
         <div className="px-8 py-5 border-b border-border flex justify-between items-center bg-background-soft/30">
-          <h4 className="font-bold text-slate-900">Recent Pool Adjustments</h4>
+          <h4 className="font-bold text-slate-900">Recent Network Adjustments</h4>
           <button className="text-primary text-[10px] font-bold uppercase tracking-widest hover:underline">View All Records</button>
         </div>
         <div className="overflow-x-auto">
@@ -193,9 +193,9 @@ export default function LiquidityPage() {
             <thead>
               <tr className="bg-background-soft/50 text-slate-400 text-[10px] font-bold uppercase tracking-wider border-b border-border">
                 <th className="px-8 py-4">Timestamp</th>
-                <th className="px-8 py-4">Pool</th>
+                <th className="px-8 py-4">Hub</th>
                 <th className="px-8 py-4">Action</th>
-                <th className="px-8 py-4">Amount</th>
+                <th className="px-8 py-4">Value (USD Eq)</th>
                 <th className="px-8 py-4">Operator</th>
                 <th className="px-8 py-4">Status</th>
               </tr>
